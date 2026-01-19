@@ -15,7 +15,7 @@ EODDATA_BASE_URL = "https://ws.eoddata.com/data.asmx/QuoteList"
 
 @app.get("/api/quote/{ticker}")
 async def get_live_quote(ticker: str):
-    """Fetch live quote data for an ASX ticker using EODData."""
+    """Diagnose EODData request problems."""
     if not EODDATA_API_KEY:
         raise HTTPException(status_code=500, detail="API key not configured")
 
@@ -25,15 +25,17 @@ async def get_live_quote(ticker: str):
         "SYMBOLS": ticker.upper()
     }
 
+    url = "https://ws.eoddata.com/data.asmx/QuoteList"
+
     async with httpx.AsyncClient() as client:
-        r = await client.get(EODDATA_BASE_URL, params=params)
+        try:
+            r = await client.get(url, params=params)
+        except Exception as e:
+            # network-level error
+            raise HTTPException(status_code=500, detail=f"Network error: {e}")
 
-    if r.status_code != 200:
-        raise HTTPException(status_code=r.status_code, detail="Failed to fetch data from EODData")
-
-    try:
-        data = r.json()
-    except Exception:
-        raise HTTPException(status_code=500, detail="Invalid JSON response from EODData")
-
-    return JSONResponse(content=data)
+    return {
+        "status_code": r.status_code,
+        "headers": dict(r.headers),
+        "text_snippet": r.text[:400]
+    }
