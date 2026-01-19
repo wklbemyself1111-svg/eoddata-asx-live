@@ -11,30 +11,24 @@ app = FastAPI(
 
 # Store your API key here or in an environment variable
 EODDATA_API_KEY = os.getenv("EODDATA_API_KEY", "ftmeSPWEKbrFQzbJAmRryxAk")
-EODDATA_BASE_URL = "https://ws.eoddata.com/data.asmx/QuoteList"
+EODDATA_BASE_URL = "https://restapi.eoddata.com/api/real-time"
 
 @app.get("/api/quote/{ticker}")
 async def get_live_quote(ticker: str):
-    """Fetch live quote data for an ASX ticker using EODData."""
     if not EODDATA_API_KEY:
         raise HTTPException(status_code=500, detail="API key not configured")
 
-    # Correct parameters for EODData .asmx service
-    params = {
-        "Token": EODDATA_API_KEY,
-        "Exchange": "ASX",
-        "Symbols": ticker.upper()
-    }
-
-    url = "https://ws.eoddata.com/data.asmx/QuoteList"
+    url = f"{EODDATA_BASE_URL}/ASX/{ticker.upper()}?token={EODDATA_API_KEY}"
 
     async with httpx.AsyncClient() as client:
-        r = await client.get(url, params=params)
+        r = await client.get(url)
 
     if r.status_code != 200:
-        raise HTTPException(status_code=r.status_code, detail=f"EODData returned status {r.status_code}")
+        raise HTTPException(status_code=r.status_code, detail=f"EODData returned {r.status_code}")
 
-    return {
-        "status_code": r.status_code,
-        "text_snippet": r.text[:400]
-    }
+    try:
+        data = r.json()
+    except Exception:
+        raise HTTPException(status_code=500, detail=f"Invalid response: {r.text[:200]}")
+
+    return data
