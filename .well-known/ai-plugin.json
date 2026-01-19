@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "EODData ASX Live Plugin",
+  "name_for_model": "eoddata_asx_live",
+  "description_for_human": "Fetch live ASX stock prices, volume, and company data from EODData.",
+  "description_for_model": "A plugin that retrieves live ASX market data, including quotes, price changes, and volume for specified tickers, using EODData via a secure proxy.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://eoddata-asx-live.onrender.com/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://eoddata-asx-live.onrender.com/logo.png",
+  "contact_email": "support@yourdomain.com",
+  "legal_info_url": "https://yourdomain.com/terms"
+}
