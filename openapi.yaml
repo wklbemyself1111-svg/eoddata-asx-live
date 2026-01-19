@@ -1,0 +1,41 @@
+openapi: 3.0.1
+info:
+  title: EODData ASX Live API
+  description: Secure proxy service fetching live ASX market data from EODData.
+  version: "1.0.0"
+servers:
+  - url: https://yourdomain.com
+paths:
+  /api/quote/{ticker}:
+    get:
+      summary: Get live quote data for an ASX ticker
+      operationId: getLiveQuote
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          description: ASX ticker symbol (e.g., PME)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful quote retrieval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticker:
+                    type: string
+                  name:
+                    type: string
+                  last_price:
+                    type: number
+                  change:
+                    type: number
+                  change_percent:
+                    type: number
+                  volume:
+                    type: integer
+                  timestamp:
+                    type: string
